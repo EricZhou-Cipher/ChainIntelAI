@@ -43,7 +43,7 @@ jobs:
 
       - name: Install backend dependencies
         working-directory: ./backend
-        run: npm install --no-fund --network-timeout 300000
+        run: npm install --no-fund --network-timeout=300000
 
       - name: Install Babel explicitly
         working-directory: ./backend
