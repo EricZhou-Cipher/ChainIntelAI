@@ -27,16 +27,38 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "yarn"
-          cache-dependency-path: backend/yarn.lock
+
+      - name: Clear npm cache
+        run: |
+          npm cache clean --force
+          echo "Cleared npm cache"
+
+      - name: Clear node_modules
+        working-directory: ./backend
+        run: |
+          if [ -d "node_modules" ]; then
+            rm -rf node_modules
+            echo "Removed node_modules directory"
+          fi
 
       - name: Install backend dependencies
         working-directory: ./backend
-        run: yarn install --frozen-lockfile --network-timeout 300000
+        run: npm install --no-fund --network-timeout 300000
+
+      - name: Install Babel explicitly
+        working-directory: ./backend
+        run: |
+          npm install --save-dev @babel/core@7.22.5 @babel/preset-env@7.22.5 @babel/plugin-transform-modules-commonjs@7.22.5 babel-jest@29.5.0 @babel/cli@7.22.5
+
+      - name: Display installed Babel packages
+        working-directory: ./backend
+        run: |
+          echo "Installed Babel packages:"
+          npm list @babel/core @babel/preset-env @babel/plugin-transform-modules-commonjs babel-jest @babel/cli || true
 
       - name: Run tests with coverage
         working-directory: ./backend
-        run: yarn test:ci
+        run: npm run test:ci
         env:
           NODE_ENV: test
           JWT_SECRET: test_secret
