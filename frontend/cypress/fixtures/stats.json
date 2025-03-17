@@ -1,0 +1,90 @@
+{
+  "stats": {
+    "system": {
+      "uptime": "15天6小时",
+      "cpuUsage": "32%",
+      "memoryUsage": "45%",
+      "diskUsage": "28%",
+      "activeUsers": 156,
+      "requestsPerMinute": 245,
+      "averageResponseTime": "120ms",
+      "errorRate": "0.5%",
+      "lastUpdated": "2023-03-17T08:45:12Z"
+    },
+    "transactions": {
+      "total": 1245678,
+      "daily": 15678,
+      "weekly": 98765,
+      "monthly": 345678,
+      "averageValue": "2.35 ETH",
+      "largestValue": "1250.00 ETH",
+      "byType": {
+        "transfer": 65,
+        "swap": 20,
+        "mint": 8,
+        "burn": 4,
+        "other": 3
+      },
+      "byStatus": {
+        "confirmed": 98.5,
+        "pending": 1.2,
+        "failed": 0.3
+      }
+    },
+    "addresses": {
+      "total": 567890,
+      "active": {
+        "daily": 12345,
+        "weekly": 45678,
+        "monthly": 123456
+      },
+      "byRiskLevel": {
+        "high": 5678,
+        "medium": 23456,
+        "low": 538756
+      },
+      "newAddresses": {
+        "daily": 1234,
+        "weekly": 7890,
+        "monthly": 34567
+      },
+      "topCountries": [
+        {"name": "美国", "count": 123456},
+        {"name": "中国", "count": 98765},
+        {"name": "俄罗斯", "count": 45678},
+        {"name": "德国", "count": 34567},
+        {"name": "英国", "count": 23456}
+      ]
+    },
+    "network": {
+      "nodesCount": 345678,
+      "edgesCount": 2345678,
+      "averageDegree": 6.8,
+      "clusteringCoefficient": 0.32,
+      "largestConnectedComponent": "89%",
+      "communities": 1234,
+      "averagePathLength": 4.2,
+      "diameter": 12
+    },
+    "risk": {
+      "totalScanned": 456789,
+      "byRiskLevel": {
+        "high": 12345,
+        "medium": 45678,
+        "low": 398766
+      },
+      "alertsGenerated": 5678,
+      "alertsByStatus": {
+        "active": 1234,
+        "resolved": 4444
+      },
+      "topRiskFactors": [
+        {"name": "混币交易", "count": 2345},
+        {"name": "暗网活动", "count": 1234},
+        {"name": "勒索软件", "count": 987},
+        {"name": "欺诈活动", "count": 876},
+        {"name": "高风险交易所", "count": 765}
+      ]
+    }
+  }
+} 

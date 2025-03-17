@@ -1,0 +1,205 @@
+name: 工作流侦探 (Workflow Detective)
+
+on:
+  # 改为仅手动触发，用于诊断问题
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "运行此工作流的原因"
+        required: true
+        default: "诊断CI问题"
+
+jobs:
+  find_workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 清除缓存
+        run: |
+          echo "清除缓存..."
+          rm -rf node_modules || true
+          rm -rf backend/node_modules || true
+          rm -rf ~/.yarn/cache || true
+          yarn cache clean || true
+          echo "✅ 缓存已清除"
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+          # 使用fresh install
+
+      - name: 安装后端依赖
+        working-directory: ./backend
+        run: yarn install --network-timeout 300000
+
+      - name: 安装根目录依赖
+        run: |
+          echo "安装根目录依赖..."
+          yarn install
+          echo "完成安装根目录依赖"
+
+      - name: 安装backend依赖
+        run: |
+          cd backend
+          echo "安装backend依赖..."
+          yarn install
+          echo "完成安装backend依赖"
+
+      - name: 显式安装关键Babel包
+        run: |
+          cd backend
+          echo "显式安装Babel包..."
+          yarn add --dev @babel/core@7.22.5 @babel/preset-env@7.22.5 @babel/plugin-transform-modules-commonjs@7.22.5 babel-jest@29.5.0
+          echo "完成Babel包安装"
+
+      - name: 确保Babel配置文件存在
+        run: |
+          cd backend
+          if [ ! -f "babel.config.js" ]; then
+            echo "创建babel.config.js..."
+            echo 'module.exports = {
+              presets: [
+                ["@babel/preset-env", { targets: { node: "current" }, modules: "commonjs" }],
+                "@babel/preset-typescript"
+              ],
+              plugins: [
+                "@babel/plugin-transform-modules-commonjs"
+              ],
+              sourceType: "unambiguous"
+            };' > babel.config.js
+          else
+            echo "babel.config.js已存在:"
+            cat babel.config.js
+          fi
+
+      - name: 检查Babel安装情况
+        run: |
+          echo "=== 根目录Babel检查 ==="
+          find node_modules -name "@babel" -type d | sort || echo "根目录未找到@babel"
+
+          echo "=== backend目录Babel检查 ==="
+          cd backend
+          find node_modules -name "@babel" -type d | sort || echo "backend目录未找到@babel"
+          ls -la node_modules/@babel || echo "@babel目录不存在或无法访问"
+
+      - name: 测试Babel能否正常工作
+        run: |
+          cd backend
+          echo "创建测试文件..."
+          echo "const test = async () => { await Promise.resolve(1); return 42; };" > babel-test.js
+
+          echo "安装babel-cli..."
+          yarn add --dev @babel/cli@7.22.5
+
+          echo "尝试编译..."
+          if [ -f "node_modules/.bin/babel" ]; then
+            ./node_modules/.bin/babel babel-test.js --out-file babel-test.compiled.js || echo "编译失败但继续执行"
+            ls -la babel-test.compiled.js || echo "编译后文件不存在但继续执行"
+          fi
+
+          echo "创建虚拟文件作为备用..."
+          echo 'module.exports = { plugins: [] };' > babel-virtual-resolve-base.js
+
+      - name: 寻找所有工作流文件
+        run: |
+          echo "=== 查找所有工作流文件 ==="
+          find . -type f -name "*.yml" -o -name "*.yaml" | grep -i workflow
+
+          echo "=== 检查工作流文件位置 ==="
+          ls -la .github/workflows/ || echo ".github/workflows/ 不存在"
+
+          # backend目录中的.github已被移除，此处只保留检查以确认
+          ls -la backend/.github/workflows/ 2>/dev/null || echo "backend/.github/workflows/ 不存在 (已整合到主仓库)"
+
+          echo "=== 查看活跃的工作流文件内容 ==="
+
+          if [ -d ".github/workflows" ]; then
+            echo "检查 .github/workflows 目录:"
+            for file in .github/workflows/*.yml; do
+              echo "=========================="
+              echo "文件: $file"
+              echo "------------------------"
+              cat "$file"
+              echo "=========================="
+            done
+          fi
+
+      - name: 检查GitHub环境
+        run: |
+          echo "=== GitHub环境变量 ==="
+          echo "GITHUB_WORKFLOW: $GITHUB_WORKFLOW"
+          echo "GITHUB_ACTION: $GITHUB_ACTION"
+          echo "GITHUB_ACTIONS: $GITHUB_ACTIONS"
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "GITHUB_REF: $GITHUB_REF"
+
+          echo "=== 当前目录结构 ==="
+          pwd
+          ls -la
+
+          echo "=== 查看当前运行的进程 ==="
+          ps aux | grep -i node
+
+          echo "=== 查看Node.js和Yarn版本 ==="
+          node -v
+          yarn -v
+          yarn --version
+
+          echo "=== Node环境变量 ==="
+          node -e "console.log('NODE_PATH:', process.env.NODE_PATH)"
+          node -e "console.log('PATH:', process.env.PATH)"
+
+      - name: 检查所有已安装的包
+        run: |
+          echo "=== yarn 全局包 ==="
+          yarn global list || echo "无法列出全局包"
+
+          echo "=== 当前目录下的 node_modules ==="
+          if [ -d "node_modules" ]; then
+            ls -la node_modules | grep babel || echo "未找到 babel 包"
+            if [ -d "node_modules/@babel" ]; then
+              ls -la node_modules/@babel
+            fi
+          else
+            echo "node_modules 不存在"
+          fi
+
+          echo "=== backend 目录下的 node_modules ==="
+          if [ -d "backend/node_modules" ]; then
+            ls -la backend/node_modules | grep babel || echo "未找到 babel 包"
+            if [ -d "backend/node_modules/@babel" ]; then
+              ls -la backend/node_modules/@babel
+            fi
+          else
+            echo "backend/node_modules 不存在"
+          fi
+
+          echo "=== 模块解析路径 ==="
+          cd backend
+          node -e "console.log('Module paths:', module.paths)"
+          node -e "try { console.log('Babel core path:', require.resolve('@babel/core')); } catch(e) { console.log('Error resolving @babel/core:', e.message); }"
+          node -e "try { console.log('Babel plugin path:', require.resolve('@babel/plugin-transform-modules-commonjs')); } catch(e) { console.log('Error resolving plugin:', e.message); }"
+
+      - name: 获取GitHub Actions运行历史
+        run: |
+          echo "=== 最近的 GitHub Actions 运行历史 ==="
+          curl -H "Accept: application/vnd.github.v3+json" \
+               -H "Authorization: token ${{ github.token }}" \
+               "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=5" | \
+          jq '.workflow_runs[] | {id, name, workflow_id, event, status, conclusion, created_at}'
+
+          echo "=== 所有工作流定义 ==="
+          curl -H "Accept: application/vnd.github.v3+json" \
+               -H "Authorization: token ${{ github.token }}" \
+               "https://api.github.com/repos/${{ github.repository }}/actions/workflows" | \
+          jq '.workflows[] | {id, name, path, state}'

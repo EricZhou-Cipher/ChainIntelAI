@@ -1,0 +1,143 @@
+name: 前端测试
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "frontend/**"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "frontend/**"
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: "./frontend/yarn.lock"
+
+      - name: 安装依赖
+        run: yarn install --frozen-lockfile
+
+      - name: 运行单元测试
+        run: yarn test
+
+      - name: 生成覆盖率报告
+        run: yarn test --coverage
+
+      - name: 上传覆盖率报告
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: ./frontend/coverage
+
+  api-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: "./frontend/yarn.lock"
+
+      - name: 安装依赖
+        run: yarn install --frozen-lockfile
+
+      - name: 运行 API 测试
+        run: yarn test tests/api
+
+      - name: 生成 API 测试覆盖率报告
+        run: yarn test --coverage tests/api
+
+      - name: 上传 API 测试覆盖率报告
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-coverage-report
+          path: ./frontend/coverage
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: "./frontend/yarn.lock"
+
+      - name: 安装依赖
+        run: yarn install --frozen-lockfile
+
+      - name: Cypress 运行
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: ./frontend
+          build: yarn build
+          start: yarn start
+          wait-on: "http://localhost:3000"
+          browser: chrome
+          record: false
+
+      - name: 上传 Cypress 截图
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./frontend/cypress/screenshots
+
+      - name: 上传 Cypress 视频
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cypress-videos
+          path: ./frontend/cypress/videos
+
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: "./frontend/yarn.lock"
+
+      - name: 安装依赖
+        run: yarn install --frozen-lockfile
+
+      - name: 运行 ESLint
+        run: yarn lint
+
+      - name: 运行类型检查
+        run: yarn type-check

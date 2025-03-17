@@ -1,0 +1,216 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 20
+      name: 'Warm up phase'
+    - duration: 120
+      arrivalRate: 20
+      rampTo: 50
+      name: 'Ramp up load'
+    - duration: 180
+      arrivalRate: 50
+      name: 'Sustained load'
+    - duration: 120
+      arrivalRate: 50
+      rampTo: 200
+      name: 'High load phase'
+    - duration: 180
+      arrivalRate: 200
+      rampTo: 500
+      name: 'Extreme load phase'
+    - duration: 120
+      arrivalRate: 500
+      name: 'Peak load phase'
+  processor: './api.load.processor.js'
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+      Accept: 'application/json'
+  ensure:
+    maxErrorRate: 5
+    max: 500
+    p95: 500
+    p99: 1000
+  plugins:
+    metrics-by-endpoint: {}
+    expect: {}
+    apdex:
+      threshold: 500
+  environments:
+    production:
+      phases:
+        - duration: 60
+          arrivalRate: 10
+          rampTo: 50
+          name: 'Warm up phase'
+        - duration: 120
+          arrivalRate: 50
+          rampTo: 200
+          name: 'Ramp up load'
+        - duration: 180
+          arrivalRate: 200
+          rampTo: 500
+          name: 'High load phase'
+        - duration: 120
+          arrivalRate: 500
+          name: 'Peak load phase'
+    staging:
+      phases:
+        - duration: 60
+          arrivalRate: 5
+          rampTo: 50
+          name: 'Warm up phase'
+        - duration: 120
+          arrivalRate: 50
+          rampTo: 200
+          name: 'Ramp up load'
+        - duration: 120
+          arrivalRate: 200
+          name: 'Sustained load'
+
+scenarios:
+  - name: 'Health check'
+    weight: 10
+    flow:
+      - get:
+          url: '/health'
+          expect:
+            - statusCode: 200
+            - contentType: 'application/json'
+            - hasProperty: 'status'
+            - equals:
+                - '$.status'
+                - 'ok'
+          capture:
+            - json: '$.status'
+              as: 'healthStatus'
+            - json: '$.timestamp'
+              as: 'responseTime'
+
+  - name: 'Analyze single transaction'
+    weight: 30
+    flow:
+      - function: 'generateTransaction'
+      - post:
+          url: '/analyze'
+          json:
+            transaction: '{{ transaction }}'
+          expect:
+            - statusCode: 200
+            - contentType: 'application/json'
+            - hasProperty: 'riskScore'
+            - hasProperty: 'riskLevel'
+          capture:
+            - json: '$.riskScore'
+              as: 'riskScore'
+            - json: '$.riskLevel'
+              as: 'riskLevel'
+            - json: '$.processingTimeMs'
+              as: 'processingTime'
+
+  - name: 'Analyze high risk transaction'
+    weight: 10
+    flow:
+      - function: 'generateHighRiskTransaction'
+      - post:
+          url: '/analyze'
+          json:
+            transaction: '{{ transaction }}'
+          expect:
+            - statusCode: 200
+            - contentType: 'application/json'
+            - hasProperty: 'riskScore'
+            - hasProperty: 'riskLevel'
+            - hasProperty: 'riskFactors'
+          capture:
+            - json: '$.riskScore'
+              as: 'riskScore'
+            - json: '$.riskLevel'
+              as: 'riskLevel'
+            - json: '$.processingTimeMs'
+              as: 'processingTime'
+
+  - name: 'Analyze batch transactions (small)'
+    weight: 20
+    flow:
+      - function: 'generateBatchTransactions'
+      - post:
+          url: '/analyze/batch'
+          json:
+            transactions: '{{ transactions }}'
+          expect:
+            - statusCode: 200
+            - contentType: 'application/json'
+            - hasProperty: 'results'
+          capture:
+            - json: '$.processingTimeMs'
+              as: 'batchProcessingTime'
+            - json: '$.results.length'
+              as: 'resultCount'
+
+  - name: 'Analyze batch transactions (medium)'
+    weight: 15
+    flow:
+      - function: 'generateLargeBatchTransactions'
+      - post:
+          url: '/analyze/batch'
+          json:
+            transactions: '{{ transactions }}'
+          expect:
+            - statusCode: 200
+            - contentType: 'application/json'
+            - hasProperty: 'results'
+          capture:
+            - json: '$.processingTimeMs'
+              as: 'batchProcessingTime'
+            - json: '$.results.length'
+              as: 'resultCount'
+
+  - name: 'Analyze batch transactions (large)'
+    weight: 10
+    flow:
+      - function: 'generateExtraLargeBatchTransactions'
+      - post:
+          url: '/analyze/batch'
+          json:
+            transactions: '{{ transactions }}'
+          expect:
+            - statusCode: 200
+            - contentType: 'application/json'
+            - hasProperty: 'results'
+          capture:
+            - json: '$.processingTimeMs'
+              as: 'batchProcessingTime'
+            - json: '$.results.length'
+              as: 'resultCount'
+
+  - name: 'Mixed API usage pattern'
+    weight: 5
+    flow:
+      - get:
+          url: '/health'
+          expect:
+            - statusCode: 200
+      - function: 'generateTransaction'
+      - post:
+          url: '/analyze'
+          json:
+            transaction: '{{ transaction }}'
+          expect:
+            - statusCode: 200
+      - function: 'generateBatchTransactions'
+      - post:
+          url: '/analyze/batch'
+          json:
+            transactions: '{{ transactions }}'
+          expect:
+            - statusCode: 200
+      - function: 'generateHighRiskTransaction'
+      - post:
+          url: '/analyze'
+          json:
+            transaction: '{{ transaction }}'
+          expect:
+            - statusCode: 200

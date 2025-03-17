@@ -1,0 +1,168 @@
+name: 系统诊断 (System Diagnostic)
+
+on:
+  workflow_dispatch:
+    inputs:
+      diagnostic_reason:
+        description: "诊断原因"
+        required: true
+        default: "例行检查"
+      diagnostic_level:
+        description: "诊断级别"
+        required: true
+        default: "basic"
+        type: choice
+        options:
+          - basic
+          - advanced
+          - emergency
+
+jobs:
+  diagnostic:
+    name: 系统诊断
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📋 显示诊断信息
+        run: |
+          echo "诊断原因: ${{ inputs.diagnostic_reason }}"
+          echo "诊断级别: ${{ inputs.diagnostic_level }}"
+          echo "运行ID: ${{ github.run_id }}"
+          echo "触发事件: ${{ github.event_name }}"
+
+      - name: 🔍 检查环境
+        run: |
+          echo "操作系统信息:"
+          uname -a
+          cat /etc/os-release
+
+          echo "磁盘空间:"
+          df -h
+
+          echo "内存使用情况:"
+          free -h
+
+          echo "CPU信息:"
+          cat /proc/cpuinfo | grep "model name" | head -n 1
+
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+
+      - name: 🔧 检查Node.js和Yarn
+        run: |
+          echo "Node.js版本:"
+          node -v
+
+          echo "Yarn版本:"
+          yarn -v || echo "Yarn未安装"
+
+          echo "检查Yarn是否存在:"
+          which yarn || echo "找不到yarn命令"
+
+          echo "检查npm是否存在:"
+          which npm || echo "找不到npm命令"
+
+      - name: 📋 检查工作流文件
+        run: |
+          echo "查找所有工作流文件:"
+          find . -name "*.yml" | grep -i workflow
+
+          echo "检查.github/workflows目录:"
+          ls -la .github/workflows/
+
+          echo "检查当前分支和提交:"
+          git branch
+          git log -1
+
+      - name: 🧪 创建基本测试
+        run: |
+          # 创建一个简单的测试文件
+          mkdir -p diagnostic-test
+          cd diagnostic-test
+          echo 'console.log("诊断测试运行中"); console.log("当前时间:", new Date().toISOString()); process.exit(0);' > diagnostic-test.js
+
+          # 运行测试
+          node diagnostic-test.js
+          echo "✅ 基本诊断测试通过"
+
+      - name: 📦 设置 Node.js
+        if: inputs.diagnostic_level != 'basic'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "yarn"
+
+      - name: 🧹 清除缓存
+        if: inputs.diagnostic_level != 'basic'
+        run: |
+          echo "清除缓存..."
+          rm -rf node_modules || true
+          rm -rf backend/node_modules || true
+          rm -rf frontend/node_modules || true
+          rm -rf ~/.yarn/cache || true
+          yarn cache clean || true
+          echo "✅ 缓存已清除"
+
+      - name: 📥 安装后端依赖
+        if: inputs.diagnostic_level == 'advanced' || inputs.diagnostic_level == 'emergency'
+        working-directory: ./backend
+        run: yarn install --network-timeout 300000
+
+      - name: 📥 安装前端依赖
+        if: inputs.diagnostic_level == 'advanced' || inputs.diagnostic_level == 'emergency'
+        working-directory: ./frontend
+        run: yarn install
+
+      - name: 🔧 检查 Babel 配置
+        if: inputs.diagnostic_level == 'advanced' || inputs.diagnostic_level == 'emergency'
+        run: |
+          cd backend
+          echo "=== backend目录中的Babel包检查 ==="
+          find node_modules -name "@babel" -type d | sort || echo "找不到@babel目录"
+          find node_modules -name "babel-*" | sort || echo "找不到babel-*包"
+
+          echo "=== 检查babel配置文件 ==="
+          if [ -f "babel.config.js" ]; then
+            echo "babel.config.js存在:"
+            cat babel.config.js
+          else
+            echo "babel.config.js不存在，创建默认配置:"
+            echo 'module.exports = {
+              presets: [
+                ["@babel/preset-env", { targets: { node: "current" }, modules: "commonjs" }]
+              ],
+              plugins: [
+                "@babel/plugin-transform-modules-commonjs"
+              ],
+              sourceType: "unambiguous"
+            };' > babel.config.js
+            echo "已创建babel.config.js"
+          fi
+
+      - name: 🧪 运行紧急测试
+        if: inputs.diagnostic_level == 'emergency'
+        run: |
+          # 创建一个紧急测试文件
+          echo 'console.log("紧急诊断测试运行中"); console.log("当前时间:", new Date().toISOString()); process.exit(0);' > emergency-test.js
+
+          # 运行测试
+          node emergency-test.js
+          echo "✅ 紧急诊断测试通过"
+
+          # 创建虚拟babel文件
+          echo 'module.exports = { plugins: [] };' > babel-virtual-resolve-base.js
+          echo "✅ 虚拟文件创建成功"
+
+      - name: 📊 获取 GitHub Actions 运行历史
+        if: inputs.diagnostic_level == 'advanced' || inputs.diagnostic_level == 'emergency'
+        run: |
+          echo "=== 最近的 GitHub Actions 运行历史 ==="
+          curl -H "Accept: application/vnd.github.v3+json" \
+               -H "Authorization: token ${{ github.token }}" \
+               "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=5" | \
+          jq '.workflow_runs[] | {id, name, workflow_id, event, status, conclusion, created_at}'
+
+          echo "=== 所有工作流定义 ==="
+          curl -H "Accept: application/vnd.github.v3+json" \
+               -H "Authorization: token ${{ github.token }}" \
+               "https://api.github.com/repos/${{ github.repository }}/actions/workflows" | \
+          jq '.workflows[] | {id, name, path, state}'

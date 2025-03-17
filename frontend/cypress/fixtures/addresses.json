@@ -1,0 +1,60 @@
+{
+  "addresses": [
+    {
+      "address": "0x1234567890abcdef1234567890abcdef12345678",
+      "balance": "15.75",
+      "transactionCount": 156,
+      "firstSeen": "2022-05-12T08:30:15Z",
+      "lastSeen": "2023-03-17T10:15:30Z",
+      "riskScore": 85,
+      "riskLevel": "high",
+      "tags": ["混币", "暗网", "高风险"]
+    },
+    {
+      "address": "0x2345678901abcdef2345678901abcdef23456789",
+      "balance": "245.32",
+      "transactionCount": 78,
+      "firstSeen": "2022-08-23T14:22:45Z",
+      "lastSeen": "2023-03-16T18:45:12Z",
+      "riskScore": 65,
+      "riskLevel": "medium",
+      "tags": ["交易所", "大额交易"]
+    },
+    {
+      "address": "0x3456789012abcdef3456789012abcdef34567890",
+      "balance": "0.05",
+      "transactionCount": 12,
+      "firstSeen": "2023-01-05T09:12:33Z",
+      "lastSeen": "2023-03-15T11:30:15Z",
+      "riskScore": 90,
+      "riskLevel": "high",
+      "tags": ["勒索软件", "黑名单"]
+    },
+    {
+      "address": "0x4567890123abcdef4567890123abcdef45678901",
+      "balance": "1250.45",
+      "transactionCount": 345,
+      "firstSeen": "2021-11-18T16:40:22Z",
+      "lastSeen": "2023-03-17T08:12:45Z",
+      "riskScore": 45,
+      "riskLevel": "medium",
+      "tags": ["智能合约", "DeFi"]
+    },
+    {
+      "address": "0x5678901234abcdef5678901234abcdef56789012",
+      "balance": "0.78",
+      "transactionCount": 23,
+      "firstSeen": "2023-02-28T12:15:30Z",
+      "lastSeen": "2023-03-16T16:50:33Z",
+      "riskScore": 25,
+      "riskLevel": "low",
+      "tags": ["新地址"]
+    }
+  ],
+  "total": 5,
+  "byRiskLevel": {
+    "high": 2,
+    "medium": 2,
+    "low": 1
+  }
+} 

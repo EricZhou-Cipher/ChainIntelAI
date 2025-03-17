@@ -1,0 +1,136 @@
+{
+  "app": {
+    "name": "ChainIntel AI",
+    "description": "区块链智能分析平台"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "alerts": "风险预警",
+    "transactions": "交易分析",
+    "addresses": "地址画像"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "subtitle": "实时监控区块链活动和风险预警",
+    "stats": {
+      "todayTransactions": "今日交易",
+      "highRiskAlerts": "高风险预警",
+      "avgProcessingTime": "平均处理时间",
+      "monitoredAddresses": "监控地址",
+      "comparedToYesterday": "相比昨日"
+    },
+    "charts": {
+      "riskDistribution": "风险分布",
+      "chainDistribution": "链分布"
+    },
+    "alerts": {
+      "title": "最近预警",
+      "viewAll": "查看全部",
+      "time": "时间",
+      "riskType": "风险类型",
+      "txHash": "交易哈希",
+      "riskLevel": "风险等级",
+      "status": "状态"
+    }
+  },
+  "alerts": {
+    "title": "风险预警",
+    "subtitle": "监控和管理区块链风险事件",
+    "filter": {
+      "all": "全部",
+      "high": "高风险",
+      "medium": "中风险",
+      "low": "低风险",
+      "pending": "待处理",
+      "processing": "处理中",
+      "resolved": "已解决"
+    },
+    "search": "搜索交易哈希或地址",
+    "timeRange": {
+      "today": "今天",
+      "yesterday": "昨天",
+      "thisWeek": "本周",
+      "thisMonth": "本月",
+      "custom": "自定义"
+    }
+  },
+  "transactions": {
+    "title": "交易分析",
+    "subtitle": "深入分析区块链交易数据",
+    "search": "搜索交易哈希",
+    "details": {
+      "overview": "概览",
+      "from": "发送方",
+      "to": "接收方",
+      "value": "金额",
+      "gasUsed": "Gas 消耗",
+      "timestamp": "时间戳",
+      "status": "状态",
+      "blockNumber": "区块高度"
+    }
+  },
+  "addresses": {
+    "title": "地址画像",
+    "subtitle": "分析区块链地址的行为和风险",
+    "search": "搜索地址",
+    "profile": {
+      "overview": "概览",
+      "balance": "余额",
+      "transactions": "交易数量",
+      "firstSeen": "首次出现",
+      "lastActive": "最后活跃",
+      "riskScore": "风险评分",
+      "tags": "标签"
+    }
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "noData": "暂无数据",
+    "viewDetails": "查看详情",
+    "back": "返回",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "export": "导出",
+    "import": "导入",
+    "settings": "设置"
+  },
+  "theme": {
+    "light": "浅色模式",
+    "dark": "深色模式",
+    "system": "跟随系统",
+    "toggle": "切换主题"
+  },
+  "language": {
+    "title": "语言",
+    "zh-CN": "中文",
+    "en-US": "English"
+  },
+  "riskLevel": {
+    "high": "高风险",
+    "medium": "中风险",
+    "low": "低风险"
+  },
+  "status": {
+    "pending": "待处理",
+    "processing": "处理中",
+    "resolved": "已解决",
+    "success": "成功",
+    "failed": "失败"
+  },
+  "riskTypes": {
+    "suspiciousTransaction": "可疑交易",
+    "addressAssociation": "地址关联",
+    "largeTransfer": "大额转账",
+    "frequentTransactions": "频繁交易",
+    "contractInteraction": "合约交互",
+    "mixerUsage": "混币服务",
+    "flashLoan": "闪电贷"
+  }
+} 

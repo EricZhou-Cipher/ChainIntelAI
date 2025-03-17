@@ -1,0 +1,92 @@
+{
+  "transactions": [
+    {
+      "hash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "blockNumber": 15678901,
+      "timestamp": "2023-03-17T10:15:30Z",
+      "from": "0x1234567890abcdef1234567890abcdef12345678",
+      "to": "0x2345678901abcdef2345678901abcdef23456789",
+      "value": "5.25",
+      "gasUsed": "21000",
+      "gasPrice": "25",
+      "status": "confirmed",
+      "type": "transfer",
+      "riskScore": 75,
+      "riskLevel": "high"
+    },
+    {
+      "hash": "0xbcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567891",
+      "blockNumber": 15678890,
+      "timestamp": "2023-03-17T09:45:12Z",
+      "from": "0x3456789012abcdef3456789012abcdef34567890",
+      "to": "0x4567890123abcdef4567890123abcdef45678901",
+      "value": "0.5",
+      "gasUsed": "150000",
+      "gasPrice": "20",
+      "status": "confirmed",
+      "type": "swap",
+      "riskScore": 60,
+      "riskLevel": "medium"
+    },
+    {
+      "hash": "0xcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567892",
+      "blockNumber": 15678880,
+      "timestamp": "2023-03-17T09:30:45Z",
+      "from": "0x5678901234abcdef5678901234abcdef56789012",
+      "to": "0x6789012345abcdef6789012345abcdef67890123",
+      "value": "0.01",
+      "gasUsed": "250000",
+      "gasPrice": "22",
+      "status": "confirmed",
+      "type": "mint",
+      "riskScore": 30,
+      "riskLevel": "low"
+    },
+    {
+      "hash": "0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567893",
+      "blockNumber": 15678870,
+      "timestamp": "2023-03-17T09:15:22Z",
+      "from": "0x7890123456abcdef7890123456abcdef78901234",
+      "to": "0x8901234567abcdef8901234567abcdef89012345",
+      "value": "2.75",
+      "gasUsed": "21000",
+      "gasPrice": "18",
+      "status": "confirmed",
+      "type": "transfer",
+      "riskScore": 15,
+      "riskLevel": "low"
+    },
+    {
+      "hash": "0xef1234567890abcdef1234567890abcdef1234567890abcdef1234567894",
+      "blockNumber": null,
+      "timestamp": "2023-03-17T10:30:15Z",
+      "from": "0x9012345678abcdef9012345678abcdef90123456",
+      "to": "0x0123456789abcdef0123456789abcdef01234567",
+      "value": "1.5",
+      "gasUsed": "21000",
+      "gasPrice": "30",
+      "status": "pending",
+      "type": "transfer",
+      "riskScore": 40,
+      "riskLevel": "medium"
+    }
+  ],
+  "total": 5,
+  "byStatus": {
+    "confirmed": 4,
+    "pending": 1,
+    "failed": 0
+  },
+  "byType": {
+    "transfer": 3,
+    "swap": 1,
+    "mint": 1,
+    "burn": 0,
+    "other": 0
+  },
+  "byRiskLevel": {
+    "high": 1,
+    "medium": 2,
+    "low": 2
+  }
+} 

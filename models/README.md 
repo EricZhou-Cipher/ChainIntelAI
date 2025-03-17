@@ -1,0 +1,11 @@
+# Models 目录说明
+
+本目录用于存放AI调用的Prompt模板和AI封装代码，包括：
+- Prompt模板
+- AI API封装
+- Future: 可加入Embedding向量化逻辑（扩展用）
+
+当前包含：
+- address_profile_prompt.txt：地址画像分析Prompt
+- transaction_analysis_prompt.txt：交易模式分析Prompt
+- aiClient.js：统一封装OpenAI/Claude调用

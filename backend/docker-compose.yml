@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hardhat:
+    build:
+      context: ./hardhat
+      dockerfile: Dockerfile
+    ports:
+      - "8545:8545"
+    command: ["npx", "hardhat", "node"]
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - hardhat_data:/root/.hardhat
+
+  replay:
+    build: .
+    command: ["node", "replayHistoricalEvents.js"]
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/chainintel
+      - ETH_NODE_WSS=ws://hardhat:8545
+      - ETH_NODE_HTTP=http://hardhat:8545
+      - ETH_CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./logs:/app/logs
+      - ./crontab:/etc/cron.d/replay-cron
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      hardhat:
+        condition: service_started
+
+  cron:
+    build: .
+    command: ["crond", "-f", "-d", "8"]
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/chainintel
+      - ETH_NODE_WSS=ws://hardhat:8545
+      - ETH_NODE_HTTP=http://hardhat:8545
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./logs:/app/logs
+      - ./crontab:/etc/cron.d/replay-cron
+    depends_on:
+      - replay
+
+volumes:
+  mongodb_data:
+  hardhat_data:

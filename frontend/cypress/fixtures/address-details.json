@@ -1,0 +1,89 @@
+{
+  "address": "0x1234567890abcdef1234567890abcdef12345678",
+  "balance": "15.75",
+  "transactionCount": 156,
+  "firstSeen": "2022-05-12T08:30:15Z",
+  "lastSeen": "2023-03-17T10:15:30Z",
+  "riskScore": 85,
+  "riskLevel": "high",
+  "tags": ["混币", "暗网", "高风险"],
+  "riskFactors": [
+    {
+      "name": "混币交易",
+      "description": "该地址参与了多次混币交易，试图隐藏资金来源",
+      "severity": "high",
+      "confidence": 0.92
+    },
+    {
+      "name": "暗网活动",
+      "description": "该地址与已知的暗网市场有交易往来",
+      "severity": "high",
+      "confidence": 0.85
+    },
+    {
+      "name": "异常交易模式",
+      "description": "该地址展示了异常的交易模式，可能涉及洗钱活动",
+      "severity": "medium",
+      "confidence": 0.78
+    }
+  ],
+  "transactionHistory": [
+    {
+      "hash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "timestamp": "2023-03-17T10:15:30Z",
+      "counterparty": "0x2345678901abcdef2345678901abcdef23456789",
+      "direction": "outgoing",
+      "value": "5.25",
+      "type": "transfer",
+      "status": "confirmed"
+    },
+    {
+      "hash": "0xfedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+      "timestamp": "2023-03-16T14:22:45Z",
+      "counterparty": "0x3456789012abcdef3456789012abcdef34567890",
+      "direction": "incoming",
+      "value": "10.0",
+      "type": "transfer",
+      "status": "confirmed"
+    },
+    {
+      "hash": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "timestamp": "2023-03-15T09:30:15Z",
+      "counterparty": "0x4567890123abcdef4567890123abcdef45678901",
+      "direction": "outgoing",
+      "value": "2.5",
+      "type": "swap",
+      "status": "confirmed"
+    }
+  ],
+  "relatedAddresses": [
+    {
+      "address": "0x2345678901abcdef2345678901abcdef23456789",
+      "relationship": "交易对手",
+      "transactionCount": 12,
+      "lastTransaction": "2023-03-17T10:15:30Z",
+      "riskLevel": "medium"
+    },
+    {
+      "address": "0x3456789012abcdef3456789012abcdef34567890",
+      "relationship": "交易对手",
+      "transactionCount": 8,
+      "lastTransaction": "2023-03-16T14:22:45Z",
+      "riskLevel": "high"
+    },
+    {
+      "address": "0x4567890123abcdef4567890123abcdef45678901",
+      "relationship": "交易对手",
+      "transactionCount": 5,
+      "lastTransaction": "2023-03-15T09:30:15Z",
+      "riskLevel": "medium"
+    }
+  ],
+  "networkPosition": {
+    "centrality": 0.75,
+    "clusterCoefficient": 0.68,
+    "communityId": "darknet-cluster-5",
+    "communitySize": 45,
+    "pathLength": 3.2
+  }
+} 

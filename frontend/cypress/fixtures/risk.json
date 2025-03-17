@@ -1,0 +1,48 @@
+{
+  "overview": {
+    "stats": {
+      "totalAddressesAnalyzed": 456789,
+      "highRiskAddresses": 12345,
+      "mediumRiskAddresses": 45678,
+      "lowRiskAddresses": 398766,
+      "riskDistribution": {
+        "high": 2.7,
+        "medium": 10.0,
+        "low": 87.3
+      },
+      "commonRiskFactors": [
+        {"name": "混币交易", "count": 2345},
+        {"name": "暗网活动", "count": 1234},
+        {"name": "勒索软件", "count": 987},
+        {"name": "欺诈活动", "count": 876},
+        {"name": "高风险交易所", "count": 765}
+      ]
+    },
+    "trends": {
+      "period": "monthly",
+      "data": [
+        {"month": "2023-01", "high": 1100, "medium": 3800, "low": 32000},
+        {"month": "2023-02", "high": 1200, "medium": 4000, "low": 33500},
+        {"month": "2023-03", "high": 1250, "medium": 4200, "low": 34000},
+        {"month": "2023-04", "high": 1300, "medium": 4300, "low": 34500},
+        {"month": "2023-05", "high": 1350, "medium": 4400, "low": 35000},
+        {"month": "2023-06", "high": 1400, "medium": 4500, "low": 35500}
+      ]
+    },
+    "model": {
+      "version": "3.2.1",
+      "lastUpdated": "2023-03-15T12:30:45Z",
+      "features": [
+        "交易模式分析",
+        "地址关联分析",
+        "时间序列分析",
+        "混币检测",
+        "暗网活动检测",
+        "异常交易检测"
+      ],
+      "accuracy": 0.95,
+      "falsePositiveRate": 0.03,
+      "falseNegativeRate": 0.02
+    }
+  }
+} 

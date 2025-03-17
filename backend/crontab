@@ -1,0 +1,5 @@
+# 每天凌晨 2 点执行事件回放
+0 2 * * * cd /app && node replayHistoricalEvents.js >> /app/logs/cron.log 2>&1
+
+# 每天凌晨 3 点执行数据清理（保留最近 30 天的数据）
+0 3 * * * cd /app && node cleanupOldData.js >> /app/logs/cleanup.log 2>&1 

@@ -1,0 +1,23 @@
+{
+  "name": "chainintelai",
+  "version": "0.1.0",
+  "description": "区块链智能分析平台 | Blockchain Intelligence Analysis Platform",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "blockchain",
+    "analytics",
+    "ai",
+    "ethereum",
+    "risk"
+  ],
+  "author": "EricZhou-Cipher",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

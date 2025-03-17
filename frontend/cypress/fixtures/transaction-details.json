@@ -1,0 +1,70 @@
+{
+  "transaction": {
+    "hash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+    "blockNumber": 15678901,
+    "blockHash": "0x9876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba",
+    "timestamp": "2023-03-17T10:15:30Z",
+    "from": "0x1234567890abcdef1234567890abcdef12345678",
+    "to": "0x2345678901abcdef2345678901abcdef23456789",
+    "value": "5.25",
+    "gasUsed": "21000",
+    "gasPrice": "25",
+    "fee": "0.000525",
+    "nonce": 45,
+    "status": "confirmed",
+    "type": "transfer",
+    "riskScore": 75,
+    "riskLevel": "high",
+    "riskFactors": [
+      {
+        "name": "高风险地址",
+        "description": "交易涉及已知的高风险地址",
+        "severity": "high",
+        "confidence": 0.95
+      },
+      {
+        "name": "异常交易金额",
+        "description": "交易金额与历史交易模式不符",
+        "severity": "medium",
+        "confidence": 0.82
+      },
+      {
+        "name": "可疑交易路径",
+        "description": "交易路径经过多个中间地址",
+        "severity": "medium",
+        "confidence": 0.75
+      }
+    ],
+    "inputData": "0x",
+    "decodedInput": null,
+    "events": [],
+    "relatedTransactions": [
+      {
+        "hash": "0xfedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+        "timestamp": "2023-03-16T14:22:45Z",
+        "relationship": "前序交易",
+        "value": "10.0"
+      },
+      {
+        "hash": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "timestamp": "2023-03-17T10:30:15Z",
+        "relationship": "后续交易",
+        "value": "2.5"
+      }
+    ],
+    "addressRisk": {
+      "from": {
+        "address": "0x1234567890abcdef1234567890abcdef12345678",
+        "riskScore": 85,
+        "riskLevel": "high",
+        "tags": ["混币", "暗网", "高风险"]
+      },
+      "to": {
+        "address": "0x2345678901abcdef2345678901abcdef23456789",
+        "riskScore": 65,
+        "riskLevel": "medium",
+        "tags": ["交易所", "大额交易"]
+      }
+    }
+  }
+} 

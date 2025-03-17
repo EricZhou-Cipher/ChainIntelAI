@@ -1,0 +1,229 @@
+name: ChainIntelAI CI/CD (禁用)
+
+on:
+  # 仅在手动触发且提供特定密钥时运行
+  workflow_dispatch:
+    inputs:
+      run_key:
+        description: "运行密钥"
+        required: true
+
+jobs:
+  setup:
+    # 添加条件使其永远不会运行
+    if: github.event.inputs.run_key == 'special_run_key_20231231'
+    runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.cache_key.outputs.value }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 获取完整历史以便检测变更
+
+      - name: 设置Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+
+      - name: 生成缓存键
+        id: cache_key
+        run: |
+          echo "value=node-modules-${{ hashFiles('**/yarn.lock') }}" >> $GITHUB_OUTPUT
+
+      - name: 缓存依赖
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn
+          key: ${{ steps.cache_key.outputs.value }}
+          restore-keys: |
+            node-modules-
+
+  backend-test:
+    needs: setup
+    # 添加条件使其永远不会运行
+    if: github.event.inputs.run_key == 'special_run_key_20231231'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      # MongoDB服务
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # Redis服务
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 设置Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+          cache-dependency-path: backend/yarn.lock
+
+      - name: 清理node_modules并安装依赖
+        run: |
+          if [ -d "node_modules" ]; then
+            rm -rf node_modules
+          fi
+          yarn install --frozen-lockfile
+
+      - name: 显式安装Babel插件和相关依赖
+        run: |
+          yarn add --dev @babel/core@7.22.5 @babel/preset-env@7.22.5 @babel/plugin-transform-modules-commonjs@7.22.5 babel-jest@29.5.0 @babel/cli@7.22.5 --exact
+
+      - name: 检查Babel插件安装情况
+        run: |
+          echo "检查babel插件安装路径和版本:"
+          ls -la node_modules/@babel/plugin-transform-modules-commonjs
+          yarn why @babel/plugin-transform-modules-commonjs
+          node -e "console.log('Babel插件已安装:', require.resolve('@babel/plugin-transform-modules-commonjs'))"
+
+      # 检查是否有测试源文件
+      - name: 检查测试文件
+        run: |
+          find tests -name "*.test.js" -o -name "*.test.ts" | sort
+          find src -name "*.test.js" -o -name "*.test.ts" | sort
+
+      # 检查配置文件是否存在
+      - name: 检查配置文件
+        run: |
+          ls -la jest.config.cjs
+          ls -la babel.config.cjs
+          ls -la jest.setup.js
+          echo "Jest配置内容:"
+          cat jest.config.cjs
+          echo "Babel配置内容:"
+          cat babel.config.cjs
+
+      # 先运行一个特定测试看看是否成功
+      - name: 运行单个测试
+        run: |
+          TEST_FILE=$(find tests -name "*.test.js" -o -name "*.test.ts" | head -1)
+          if [ -n "$TEST_FILE" ]; then
+            echo "尝试运行单个测试: $TEST_FILE"
+            NODE_OPTIONS=--max-old-space-size=4096 yarn jest --no-cache --runInBand --verbose --config=jest.config.cjs $TEST_FILE
+          else
+            echo "未找到测试文件"
+          fi
+        env:
+          CI: true
+          NODE_ENV: test
+          JWT_SECRET: test_secret
+          MONGO_URI: mongodb://localhost:27017/chainintelai_test
+          DEBUG: "jest,jest-worker"
+          BABEL_ENV: test
+
+      - name: 运行测试
+        run: NODE_OPTIONS=--max-old-space-size=4096 yarn jest --no-cache --runInBand --verbose --config=jest.config.cjs
+        env:
+          CI: true
+          NODE_ENV: test
+          JWT_SECRET: test_secret
+          MONGO_URI: mongodb://localhost:27017/chainintelai_test
+          DEBUG: "jest,jest-worker"
+          BABEL_ENV: test
+
+      - name: 上传测试覆盖率报告
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: backend/coverage/
+
+  hardhat-test:
+    needs: setup
+    # 添加条件使其永远不会运行
+    if: github.event.inputs.run_key == 'special_run_key_20231231'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/hardhat
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 设置Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+          cache-dependency-path: backend/hardhat/yarn.lock
+
+      - name: 安装依赖
+        run: yarn install --frozen-lockfile
+
+      - name: 编译合约
+        run: yarn compile
+
+      - name: 确保deployed目录存在
+        run: mkdir -p deployed
+
+      - name: 运行测试
+        run: yarn test
+
+  build:
+    needs: [backend-test, hardhat-test]
+    # 添加条件使其永远不会运行
+    if: github.event.inputs.run_key == 'special_run_key_20231231' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 设置Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+
+      - name: 恢复缓存
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn
+          key: ${{ needs.setup.outputs.cache_key }}
+
+      - name: 构建后端
+        run: |
+          cd backend
+          yarn build
+
+      - name: 构建前端
+        run: |
+          cd frontend
+          yarn build
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            backend/dist
+            frontend/build

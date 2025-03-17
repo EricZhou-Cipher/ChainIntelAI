@@ -1,0 +1,81 @@
+groups:
+  - name: chain-intel-alerts
+    rules:
+      # 服务健康检查告警
+      - alert: ServiceDown
+        expr: up{job="chain-intel"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "服务 {{ $labels.instance }} 已停止"
+          description: "服务已停止运行超过1分钟"
+
+      # 数据库连接告警
+      - alert: DatabaseConnectionError
+        expr: mongodb_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "数据库连接失败"
+          description: "无法连接到 MongoDB 数据库"
+
+      # 区块链节点连接告警
+      - alert: BlockchainNodeError
+        expr: ethereum_node_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "区块链节点连接失败"
+          description: "无法连接到以太坊节点"
+
+      # 高风险交易告警
+      - alert: HighRiskTransaction
+        expr: transfer_risk_level{level="HIGH"} > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "检测到高风险交易"
+          description: "发现高风险转账事件，金额: {{ $value }} ETH"
+
+      # 系统资源告警
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 1.5e9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "内存使用率过高"
+          description: "服务内存使用超过1.5GB"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU使用率过高"
+          description: "服务CPU使用率超过80%"
+
+      # 日志错误告警
+      - alert: HighErrorRate
+        expr: rate(log_errors_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "错误日志率过高"
+          description: "5分钟内错误日志超过10条"
+
+      # 事件处理延迟告警
+      - alert: EventProcessingDelay
+        expr: event_processing_delay_seconds > 300
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "事件处理延迟"
+          description: "事件处理延迟超过5分钟" 

@@ -1,0 +1,81 @@
+name: 测试
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 设置Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+
+      - name: 安装依赖
+        run: yarn install
+
+      - name: 运行Jest测试
+        run: yarn test --coverage
+
+      - name: 运行Cypress组件测试
+        uses: cypress-io/github-action@v5
+        with:
+          component: true
+          browser: chrome
+
+      - name: 运行Cypress E2E测试
+        uses: cypress-io/github-action@v5
+        with:
+          start: yarn dev
+          wait-on: "http://localhost:3000"
+          browser: chrome
+
+      - name: 运行无障碍测试
+        run: yarn cypress run --component --spec "cypress/component/A11yTests.cy.jsx"
+
+      - name: 上传测试覆盖率报告
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: 检查测试覆盖率
+        run: |
+          COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "测试覆盖率低于90%: $COVERAGE%"
+            exit 1
+          else
+            echo "测试覆盖率达标: $COVERAGE%"
+          fi
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "yarn"
+
+      - name: 安装依赖
+        run: |
+          cd frontend
+          yarn install --frozen-lockfile
+
+      - name: 运行 ESLint
+        run: |
+          cd frontend
+          yarn lint

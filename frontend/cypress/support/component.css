@@ -1,0 +1,88 @@
+/* 组件测试的全局样式 */
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+/* 测试容器样式 */
+[data-cy-root] {
+  padding: 1rem;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 无障碍测试辅助样式 */
+.focus-visible {
+  outline: 2px solid #4299e1 !important;
+  outline-offset: 2px !important;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  body {
+    background-color: #fff;
+    color: #000;
+  }
+
+  a,
+  button {
+    color: #0000ee;
+    text-decoration: underline;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 组件测试特定的样式 */
+.cy-wrapper {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* 确保组件在测试环境中正确显示 */
+[data-cy-root] {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 模拟暗模式 */
+.dark [data-cy-root] {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+/* 响应式测试辅助类 */
+.cy-mobile {
+  max-width: 375px;
+}
+
+.cy-tablet {
+  max-width: 768px;
+}
+
+.cy-desktop {
+  max-width: 1280px;
+}

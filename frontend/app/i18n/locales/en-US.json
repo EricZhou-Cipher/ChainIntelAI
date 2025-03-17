@@ -1,0 +1,51 @@
+{
+  "app": {
+    "name": "ChainIntel AI",
+    "description": "Blockchain Intelligence Analysis Platform"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "alerts": "Risk Alerts",
+    "transactions": "Transaction Analysis",
+    "addresses": "Address Profiling"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Real-time monitoring of blockchain activities and risk alerts",
+    "stats": {
+      "todayTransactions": "Today's Transactions",
+      "highRiskAlerts": "High Risk Alerts",
+      "avgProcessingTime": "Avg. Processing Time",
+      "monitoredAddresses": "Monitored Addresses",
+      "comparedToYesterday": "compared to yesterday"
+    },
+    "charts": {
+      "riskDistribution": "Risk Distribution",
+      "chainDistribution": "Chain Distribution"
+    },
+    "alerts": {
+      "title": "Recent Alerts",
+      "viewAll": "View All",
+      "time": "Time",
+      "riskType": "Risk Type",
+      "txHash": "Transaction Hash",
+      "riskLevel": "Risk Level",
+      "status": "Status"
+    }
+  },
+  "riskLevel": {
+    "high": "High Risk",
+    "medium": "Medium Risk",
+    "low": "Low Risk"
+  },
+  "status": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "resolved": "Resolved"
+  },
+  "riskTypes": {
+    "suspiciousTransaction": "Suspicious Transaction",
+    "addressAssociation": "Address Association",
+    "largeTransfer": "Large Transfer"
+  }
+}
